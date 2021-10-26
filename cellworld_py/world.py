@@ -21,10 +21,10 @@ class World_configuration(Json_object):
 
 class World_implementation(Json_object):
 
-    def __init__(self):
-        self.cell_locations = Location_list()
-        self.space = Space()
-        self.cell_transformation = Transformation()
+    def __init__(self, cell_locations=Location_list(), space=Space(), cell_transformation=Transformation()):
+        self.cell_locations = cell_locations
+        self.space = space
+        self.cell_transformation = cell_transformation
 
     @staticmethod
     def get_from_name(world_name, name):
@@ -35,28 +35,28 @@ class World_implementation(Json_object):
         return Json_get(get_resource("world_implementation", world_name, name), World_implementation)
 
     @staticmethod
-    def create(world_configuration, center_location, center_coordinates, relative_locations=None, relative_locations_transformations=None):
+    def create(world_configuration, space, cell_transformation=None, relative_locations=None, relative_locations_transformations=None, center_coordinates=Coordinates(0, 0)):
         if relative_locations is None:
             if relative_locations_transformations is None:
                 raise "either relative_locations or relative_locations_transformations must be used"
             if type(relative_locations_transformations) is tuple:
                 relative_locations_transformations = Transformation.get_transformations(*relative_locations_transformations)
             relative_locations = World_implementation.create_cell_locations(relative_locations_transformations)
-            if len(relative_locations.locations) != len(world_configuration.connection_pattern.coordinates):
+            if len(relative_locations) != len(world_configuration.connection_pattern):
                 raise "number of transformations must match the number of connections in the connection pattern"
 
         check_type(world_configuration, World_configuration, "incorrect type for world_configuration")
-        check_type(center_location, Location, "incorrect type for center_location")
+        check_type(space, Space, "incorrect type for space")
         check_type(center_coordinates, Coordinates, "incorrect type for center_coordinates")
         check_type(relative_locations, Location_list, "incorrect type for relative_locations")
-        if len(world_configuration.connection_pattern.coordinates) != len(relative_locations.locations):
+        if len(world_configuration.connection_pattern) != len(relative_locations):
             raise "the number of locations must match the number of connections"
-        wi = World_implementation()
-        wi.center = center_location
-        wi.cell_locations.locations = [Location() for x in range(len(world_configuration.cell_coordinates.coordinates))]
-        completed = [False for x in range(len(world_configuration.cell_coordinates.coordinates))]
+        wi = World_implementation(space=space, cell_transformation=cell_transformation)
+        for x in world_configuration.cell_coordinates:
+            wi.cell_locations.append(Location())
+        completed = [False for x in world_configuration.cell_coordinates]
         cmap = Cell_map(world_configuration.cell_coordinates)
-        wi.cell_locations.locations[cmap[center_coordinates]] = center_location
+        wi.cell_locations[cmap[center_coordinates]] = space.center
         set_location(wi.cell_locations, world_configuration.connection_pattern, relative_locations, cmap, center_coordinates, completed)
         return wi
 
@@ -69,14 +69,14 @@ class World_implementation(Json_object):
             theta = math.radians(transformation.rotation)
             cell_location = Location(0, 0)
             cell_location.move(theta, transformation.size)
-            cell_locations.locations.append(cell_location)
+            cell_locations.append(cell_location)
         return cell_locations
 
     def transform (self, dst_space, cell_transformation=None):
         check_type(dst_space, Space, "incorrect type for dst_space")
         for index, location in enumerate(self.cell_locations):
             new_location = Space.transform_to(location, self.space, dst_space)
-            self.cell_locations.locations[index] = new_location
+            self.cell_locations[index] = new_location
         if cell_transformation is None:
             cell_transformation = Transformation()
             cell_transformation.size = self.cell_transformation.size * dst_space.transformation.size / self.space.transformation.size
@@ -90,10 +90,16 @@ class World:
     def __init__(self, world_configuration):
         if not isinstance(world_configuration, World_configuration):
             raise "incorrect type for world_configuration"
-
-        self.cells = Json_list(None, Cell)
+        self.configuration = world_configuration
+        self.implementation = None
+        self.cells = Cell_group()
         for cc in world_configuration.cell_coordinates:
             self.cells.append(Cell(cell_id=len(self.cells), coordinates=cc))
+
+    def set_implementation(self, world_implementation):
+        self.implementation = world_implementation
+        for cell_id, location in enumerate(world_implementation.cell_locations):
+            self.cells[cell_id].location = location
 
     @staticmethod
     def get_from_parameters_names(world_configuration_name, world_implementation_name=None, occlussions_name=None):
@@ -114,15 +120,11 @@ class World:
         wc = world_configuration
         w = World(wc)
         if world_implementation:
-            if not isinstance(world_implementation, World_implementation):
-                raise "incorrect type for world_implementation"
-            for cell_id, location in enumerate(world_implementation.cell_locations):
-                w.cells[cell_id].location = location
+            check_type(world_implementation, World_implementation, "incorrect type for world_implementation")
+            w.set_implementation(world_implementation)
 
         if occlusions:
-            if not isinstance(occlusions, Cell_group_builder):
-                raise "incorrect type for occlusions"
-
+            check_type(occlusions, Cell_group_builder, "incorrect type for occlusions")
             for cell_id in occlusions.cell_ids:
                 w.cells[cell_id].occluded = True
         return w
@@ -142,11 +144,11 @@ def set_location(location_list, connection_pattern, relative_locations, cmap, co
         return
     completed[index] = True
     location = location_list[index]
-    for i, c in enumerate(connection_pattern.coordinates):
+    for i, c in enumerate(connection_pattern):
         cc = c + coordinates
         cindex = cmap[cc]
         if cindex >= 0:
-            location_list.locations[cindex] = location + relative_locations[i]
+            location_list[cindex] = location + relative_locations[i]
             set_location(location_list, connection_pattern, relative_locations, cmap, cc, completed)
 
 

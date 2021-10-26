@@ -14,8 +14,8 @@ class Display:
         #self.ax.axes.xaxis.set_visible(False)
         #self.ax.axes.yaxis.set_visible(False)
 
-        xcenter = world.implementation.center.x
-        ycenter = world.implementation.center.y
+        xcenter = world.implementation.space.center.x
+        ycenter = world.implementation.space.center.y
 
         hsize = world.implementation.space.transformation.size / 2
         pad = hsize * padding
@@ -32,7 +32,7 @@ class Display:
         ssides = world.implementation.space.shape.sides
         srotation = math.radians(0-world.implementation.space.transformation.rotation)
 
-        csides = world.cell_shape.sides
+        csides = world.configuration.cell_shape.sides
         crotation = math.radians(0 - world.implementation.cell_transformation.rotation - srotation)
 
 

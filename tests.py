@@ -111,10 +111,10 @@ def test_cell():
 
 def test_world_configuration():
     print("testing world_configuration: ", end="")
-    wi = World_configuration.get_from_name("hexagonal")
-    assert(wi.cell_shape.sides == 6)
-    assert(len(wi.cell_coordinates) == 331)
-    assert(len(wi.connection_pattern) == 6)
+    wc = World_configuration.get_from_name("hexagonal")
+    assert(wc.cell_shape.sides == 6)
+    assert(len(wc.cell_coordinates) == 331)
+    assert(len(wc.connection_pattern) == 6)
     print("ok")
 
 
@@ -134,7 +134,17 @@ def test_world():
     w = World.get_from_parameters_names("hexagonal", "canonical", "00_00")
     print("ok")
 
-
+def test_display():
+    wc = World_configuration.get_from_name("hexagonal")
+    src_space = Space(center=Location(0, 0), shape=Shape(6), transformation=Transformation(21.0 + 1.0 / 3.0, 30))
+    wi = World_implementation.create(wc, space=src_space, cell_transformation=Transformation(size=1, rotation=0), relative_locations_transformations=(6, -90, 1))
+    from matplotlib import pyplot as plt
+    print("testing display: ", end="")
+    o = Cell_group_builder.get_from_name("hexagonal", "00_00", "occlusions")
+    w = World.get_from_parameters(wc, wi, o)
+    d = Display(w)
+    plt.show()
+    print("ok")
 
 
 test_coordinates()
@@ -148,3 +158,4 @@ test_cell()
 test_world_configuration()
 test_world_implementation()
 test_world()
+test_display()

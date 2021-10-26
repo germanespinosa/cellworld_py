@@ -19,6 +19,7 @@ class Cell_group_builder(Json_list):
     def __init__(self, iterable=None):
         Json_list.__init__(self, iterable, allowedType=int)
 
+    @staticmethod
     def get_from_name(world_name, name, *argv):
         if not type(world_name) is str:
             raise "incorrect type for world_name"
@@ -28,25 +29,34 @@ class Cell_group_builder(Json_list):
 
 
 
-class Cell_group:
-    def __init__(self, world, cell_group_builder=[]):
-        self.world = world
-        self.cell_ids = cell_group_builder.cell_ids
+class Cell_group(Json_list):
+    def __init__(self, iterable=None, world=None, cell_group_builder=[]):
+        Json_list.__init__(self, iterable, allowedType=Cell)
+        if world:
+            for cell_id in cell_group_builder:
+                self.append(world.cells[cell_id])
 
-    def add(self, cell):
-        if cell.id in self.cell_ids:
-            return False
-        self.cell_ids.append(cell.id)
-        return True
+    def free_cells(self):
+        cg = Cell_group()
+        for cell in self:
+            if not cell.occluded:
+                cg.append(cell)
+        return cg
 
-    def __str__(self):
+    def occluded_cells(self):
+        cg = Cell_group()
+        for cell in self:
+            if cell.occluded:
+                cg.append(cell)
+        return cg
+
+    def builder(self):
         cgb = Cell_group_builder()
-        cgb.cell_ids = self.cell_ids
-        return str(cgb.cell_ids)
-
+        for cell in self:
+            cgb.append(cell.id)
+        return cgb
 
 class Cell_map:
-
     def __init__(self, coordinates_list):
         check_type(coordinates_list, Coordinates_list, "incorrect type for coordinates_list")
         self.coordinates = coordinates_list
@@ -57,7 +67,7 @@ class Cell_map:
         size_x = max(x) - self.base_x + 1
         size_y = max(y) - self.base_y + 1
         self.index = [[-1 for y in range(size_y)] for x in range(size_x)]
-        for i, c in enumerate(coordinates_list.coordinates):
+        for i, c in enumerate(coordinates_list):
             self.index[c.x][c.y] = i
 
     def __getitem__(self, coordinates):
