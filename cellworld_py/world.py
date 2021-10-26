@@ -1,5 +1,3 @@
-import math
-
 from .util import *
 from .location import Location, Location_list
 from .coordinates import Coordinates, Coordinates_list
@@ -8,31 +6,20 @@ from .cell import Cell, Cell_group_builder, Cell_group, Cell_map
 from .util import check_type
 
 
-class World_configuration:
+class World_configuration(Json_object):
     def __init__(self):
         self.cell_shape = Shape()
         self.cell_coordinates = Coordinates_list()
         self.connection_pattern = Coordinates_list()
 
     @staticmethod
-    def get(world_configuration):
-        wc = World_configuration()
-        wc.cell_shape = Shape.get(world_configuration["cell_shape"])
-        wc.cell_coordinates = Coordinates_list.get(world_configuration["cell_coordinates"])
-        wc.connection_pattern = Coordinates_list.get(world_configuration["connection_pattern"])
-        return wc
-
-    @staticmethod
     def get_from_name(name):
         if not type(name) is str:
             raise "incorrect type for name"
-        return World_configuration.get(get_resource("world_configuration", name))
-
-    def __str__(self):
-        return '{"cell_shape":%s,"cell_coordinates":%s,"connection_pattern":%s}' % (self.cell_descriptor, self.cell_coordinates, self.connection_pattern)
+        return Json_get(get_resource("world_configuration", name), World_configuration)
 
 
-class World_implementation(Location_list):
+class World_implementation(Json_object):
 
     def __init__(self):
         self.cell_locations = Location_list()
@@ -40,22 +27,12 @@ class World_implementation(Location_list):
         self.cell_transformation = Transformation()
 
     @staticmethod
-    def get(world_implementation):
-        wi = World_implementation()
-        wi.cell_locations = Locations_list.get(world_implementation["cell_locations"])
-        wi.center = Location.get(world_implementation["center"])
-        wi.space_shape = Shape.get(world_implementation["space_shape"])
-        wi.space_transformation = Transformation.get(world_implementation["space_transformation"])
-        wi.cell_transformation = Transformation.get(world_implementation["cell_transformation"])
-        return wi
-
-    @staticmethod
     def get_from_name(world_name, name):
         if not type(world_name) is str:
             raise "incorrect type for world_name"
         if not type(name) is str:
             raise "incorrect type for name"
-        return World_implementation.get(get_resource("world_implementation", world_name, name))
+        return Json_get(get_resource("world_implementation", world_name, name), World_implementation)
 
     @staticmethod
     def create(world_configuration, center_location, center_coordinates, relative_locations=None, relative_locations_transformations=None):
@@ -71,7 +48,7 @@ class World_implementation(Location_list):
         check_type(world_configuration, World_configuration, "incorrect type for world_configuration")
         check_type(center_location, Location, "incorrect type for center_location")
         check_type(center_coordinates, Coordinates, "incorrect type for center_coordinates")
-        check_type(relative_locations, Locations_list, "incorrect type for relative_locations")
+        check_type(relative_locations, Location_list, "incorrect type for relative_locations")
         if len(world_configuration.connection_pattern.coordinates) != len(relative_locations.locations):
             raise "the number of locations must match the number of connections"
         wi = World_implementation()
@@ -83,13 +60,10 @@ class World_implementation(Location_list):
         set_location(wi.cell_locations, world_configuration.connection_pattern, relative_locations, cmap, center_coordinates, completed)
         return wi
 
-    def __str__(self):
-        return '{"space":%s,"cell_radius":%f,"cell_locations":%s}' % (str(self.space), self.cell_radius, str(self.cell_descriptor))
-
     @staticmethod
     def create_cell_locations(transformations):
         check_type(transformations, list, "incorrect type for transformations")
-        cell_locations = Locations_list()
+        cell_locations = Location_list()
         for transformation in transformations:
             check_type(transformation, Transformation, "incorrect type for transformation")
             theta = math.radians(transformation.rotation)
@@ -113,17 +87,13 @@ class World_implementation(Location_list):
 
 
 class World:
-    def __init__(self, world_configuration=None):
-        self.name = ""
-        if world_configuration is None:
-            self.cell_shape = Shape()
-            self.connection_pattern = Coordinates_list()
-        else:
-            if not isinstance(world_configuration, World_configuration):
-                raise "incorrect type for world_configuration"
-            self.cell_shape = world_configuration.cell_shape
-            self.connection_pattern = world_configuration.connection_pattern
-        self.cells = []
+    def __init__(self, world_configuration):
+        if not isinstance(world_configuration, World_configuration):
+            raise "incorrect type for world_configuration"
+
+        self.cells = Json_list(None, Cell)
+        for cc in world_configuration.cell_coordinates:
+            self.cells.append(Cell(cell_id=len(self.cells), coordinates=cc))
 
     @staticmethod
     def get_from_parameters_names(world_configuration_name, world_implementation_name=None, occlussions_name=None):
@@ -143,13 +113,10 @@ class World:
 
         wc = world_configuration
         w = World(wc)
-        w.implementation = world_implementation
-        for cell_id, coordinates in enumerate(wc.cell_coordinates.coordinates):
-            w.cells.append(Cell(cell_id, coordinates))
         if world_implementation:
             if not isinstance(world_implementation, World_implementation):
-                raise "incorrect type for cell_locations"
-            for cell_id, location in enumerate(world_implementation.cell_locations.locations):
+                raise "incorrect type for world_implementation"
+            for cell_id, location in enumerate(world_implementation.cell_locations):
                 w.cells[cell_id].location = location
 
         if occlusions:
@@ -160,29 +127,14 @@ class World:
                 w.cells[cell_id].occluded = True
         return w
 
-    @staticmethod
-    def get(world):
-        w = World()
-        w.name = world["name"]
-        #w.cell_shape = Shape.get(world["cell_shape"])
-        w.connection_pattern = Coordinates_list.get(world["connection_pattern"])
-        w.cells = [Cell.get(c) for c in world["cells"]]
-        return w
-
-    @staticmethod
-    def get_from_name(name):
-        if not type(name) is str:
-            raise "incorrect type for name"
-        return World.get(get_resource("world", name))
-
     def __str__(self):
-        return '{"name":"%s","cell_shape":%s,"cells":[%s],"connection_pattern":%s}' % (self.name, self.cell_descriptor, ",".join([str(cell) for cell in self.cells]), self.connection_pattern)
+        return str(self.cells)
 
 
 def set_location(location_list, connection_pattern, relative_locations, cmap, coordinates, completed):
-    check_type(location_list, Locations_list, "incorrect type for location_list")
+    check_type(location_list, Location_list, "incorrect type for location_list")
     check_type(connection_pattern, Coordinates_list, "incorrect type for connection_pattern")
-    check_type(relative_locations, Locations_list, "incorrect type for relative_locations")
+    check_type(relative_locations, Location_list, "incorrect type for relative_locations")
     check_type(cmap, Cell_map, "incorrect type for map")
     check_type(coordinates, Coordinates, "incorrect type for coordinates")
     index = cmap[coordinates]

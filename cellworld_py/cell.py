@@ -3,43 +3,29 @@ from .location import Location
 from .coordinates import Coordinates, Coordinates_list
 
 
-class Cell:
-    def __init__(self, cell_id, coordinates=Coordinates(), location=Location(), occluded=False):
+class Cell(Json_object):
+    def __init__(self, cell_id=0, coordinates=Coordinates(), location=Location(), occluded=False):
+        check_type(coordinates, Coordinates, "wrong type for coordinates")
+        check_type(location, Location, "wrong type for location")
+        check_type(cell_id, int, "wrong type for cell_id")
+        check_type(occluded, bool, "wrong type for occluded")
         self.id = int(cell_id)
         self.coordinates = coordinates
         self.location = location
         self.occluded = occluded
 
-    def get(cell):
-        return Cell(cell_id=cell["id"], coordinates=Coordinates.get(cell["coordinates"]), location=Location.get(cell["location"]), occluded=cell["occluded"])
 
-    def __str__(self):
-        return '{"id":%d,"coordinates":%s,"location":%s,"occluded":%s}' % (self.id, self.coordinates, self.location, "true" if self.occluded else "false")
-
-
-class Cell_group_builder:
-    def __init__(self):
-        self.cell_ids = []
-
-    def get(cell_ids):
-        if type(cell_ids) is not list:
-            raise "incorrect type for cell_ids"
-        cg = Cell_group_builder()
-        for cell_id in cell_ids:
-            if type(cell_id) is not int:
-                raise "incorrect type for cell_ids"
-            cg.cell_ids.append(cell_id)
-        return cg
+class Cell_group_builder(Json_list):
+    def __init__(self, iterable=None):
+        Json_list.__init__(self, iterable, allowedType=int)
 
     def get_from_name(world_name, name, *argv):
         if not type(world_name) is str:
             raise "incorrect type for world_name"
         if not type(name) is str:
             raise "incorrect type for name"
-        return Cell_group_builder.get(get_resource("cell_group", world_name, name, *argv))
+        return Json_get(get_resource("cell_group", world_name, name, *argv), Cell_group_builder)
 
-    def __str__(self):
-        return "[" + ",".join([str(x) for x in self.cell_ids]) + "]"
 
 
 class Cell_group:

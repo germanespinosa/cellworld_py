@@ -1,5 +1,6 @@
 from cellworld_py import *
 
+
 def test_coordinates():
     print("testing coordinates: ", end="")
     assert (Coordinates(1, 2).x == Coordinates(1, 3).x)
@@ -66,6 +67,7 @@ def test_location_list():
     assert (cl.get("y") == [2, 4, 6, 8])
     print("ok")
 
+
 def test_shape():
     print("testing shape: ", end="")
     assert (Shape(1).sides == 1)
@@ -73,6 +75,7 @@ def test_shape():
     assert (Json_get("{\"sides\":6}", Shape) == Shape(6))
     assert (str(Shape(6)) == "{\"sides\":6}")
     print("ok")
+
 
 def test_transformation():
     print("testing transformation: ", end="")
@@ -84,10 +87,64 @@ def test_transformation():
     print("ok")
 
 
+def test_space():
+    print("testing space: ", end="")
+    assert (Space(Location(1, 2), Shape(6), Transformation(0, 1)).center == Location(1, 2))
+    assert (Space(Location(1, 2), Shape(6), Transformation(0, 1)).shape == Shape(6))
+    assert (Space(Location(1, 2), Shape(6), Transformation(0, 1)).transformation == Transformation(0, 1))
+    assert (str(Space(Location(1, 2), Shape(6), Transformation(0, 1))) == '{"center":{"x":1.0,"y":2.0},"shape":{"sides":6},"transformation":{"size":0.0,"rotation":1.0}}')
+    assert (Json_get('{"center":{"x":1.0,"y":2.0},"shape":{"sides":6},"transformation":{"size":0.0,"rotation":1.0}}',Space) == Space(Location(1, 2), Shape(6), Transformation(0, 1)))
+    print("ok")
+
+
+
+def test_cell():
+    print("testing cell: ", end="")
+    assert (Cell(1, Coordinates(1, 2), Location(3, 4), True).id == 1)
+    assert (Cell(1, Coordinates(1, 2), Location(3, 4), True).coordinates == Coordinates(1, 2))
+    assert (Cell(1, Coordinates(1, 2), Location(3, 4), True).location == Location(3, 4))
+    assert (Cell(1, Coordinates(1, 2), Location(3, 4), True).occluded == True)
+    assert (str(Cell(1, Coordinates(1, 2), Location(3, 4), True)) == '{"id":1,"coordinates":{"x":1,"y":2},"location":{"x":3.0,"y":4.0},"occluded":true}')
+    assert (Json_get('{"id":1,"coordinates":{"x":1,"y":2},"location":{"x":3.0,"y":4.0},"occluded":true}',Cell) == Cell(1, Coordinates(1, 2), Location(3, 4), True))
+    print("ok")
+
+
+def test_world_configuration():
+    print("testing world_configuration: ", end="")
+    wi = World_configuration.get_from_name("hexagonal")
+    assert(wi.cell_shape.sides == 6)
+    assert(len(wi.cell_coordinates) == 331)
+    assert(len(wi.connection_pattern) == 6)
+    print("ok")
+
+
+def test_world_implementation():
+    print("testing world_implementation: ", end="")
+    wi = World_implementation.get_from_name("hexagonal", "canonical")
+    check_type(wi, World_implementation, "wrong type for World_implementation")
+    assert (len(wi.cell_locations) == 331)
+    check_type(wi.space, Space, "wrong type for space")
+    check_type(wi.cell_transformation, Transformation, "wrong type for cell_transformation")
+    print("ok")
+
+def test_world():
+    print("testing world: ", end="")
+    w = World.get_from_parameters_names("hexagonal", "canonical")
+    w = World.get_from_parameters_names("hexagonal", "canonical")
+    w = World.get_from_parameters_names("hexagonal", "canonical", "00_00")
+    print("ok")
+
+
+
+
 test_coordinates()
 test_coordinates_list()
 test_location()
 test_location_list()
 test_shape()
 test_transformation()
-
+test_space()
+test_cell()
+test_world_configuration()
+test_world_implementation()
+test_world()

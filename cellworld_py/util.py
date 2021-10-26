@@ -61,6 +61,8 @@ class Json_object:
             s += "\"%s\":" % k
             if isinstance(v[k], str):
                 s += "\"%s\"" % v[k]
+            elif isinstance(v[k], bool):
+                s += "%s" % str(v[k]).lower()
             else:
                 s += "%s" % str(v[k])
         return "{%s}" % s
@@ -148,6 +150,7 @@ class Json_list(list):
             l.append(vars(i)[m])
         return l
 
+
 def Json_get(j, t):
     if isinstance(j, str):
         j = json.loads(j)
@@ -157,9 +160,9 @@ def Json_get(j, t):
         for k in j:
             it = type(getattr(v, k))
             if issubclass(it, Json_object):
-                av = Json_object.get(j[k], it)
+                av = Json_get(j[k], it)
             elif issubclass(it, Json_list):
-                av = Json_list.get(j[k], it)
+                av = Json_get(j[k], it)
             else:
                 av = it(j[k])
             setattr(v, k, av)
