@@ -158,7 +158,10 @@ class Json_list(list):
     def where(self, m, v, o="=="):
         nl = type(self)()
         for i in self:
-            e = "'%s' %s '%s'" % (str(vars(i)[m]), o, str(v))
+            if type(vars(i)[m]) is str or issubclass(type(vars(i)[m]), Json_object):
+                e = "'%s' %s '%s'" % (str(vars(i)[m]), o, str(v))
+            else:
+                e = "%s %s %s" % (str(vars(i)[m]), o, str(v))
             if eval(e):
                 nl.append(i)
         return nl
