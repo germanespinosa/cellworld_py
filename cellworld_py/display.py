@@ -1,6 +1,7 @@
 import numpy
 from matplotlib.patches import RegularPolygon
 import matplotlib.pyplot as plt
+import matplotlib.colors
 from .world import *
 from .experiment import *
 
@@ -48,12 +49,17 @@ class Display:
     def add_trajectories(self, trajectories, colors={}):
         check_type(trajectories, Trajectories, "wrong type for trajectories")
         agents = trajectories.get_agent_names()
-        for agent in agents:
+        for index, agent in enumerate(agents):
             locations = trajectories.get_agent_trajectory(agent).get("location")
             x = locations.get("x")
             y = locations.get("y")
-            color = None
+            color = list(matplotlib.colors.cnames.keys())[index]
             if agent in colors:
                 color = colors[agent]
             for i in range(len(x)-1):
-                self.ax.plot([x[i], x[i+1]], [y[i],y[i+1]], color=color[i] if type(color) is numpy.ndarray else color, alpha=.5, linewidth=3)
+                lcolor = None
+                if type(color) is numpy.ndarray:
+                    lcolor = color[i]
+                else:
+                    lcolor = color
+                self.ax.plot([x[i], x[i+1]], [y[i],y[i+1]], color=lcolor, alpha=.5, linewidth=3)
