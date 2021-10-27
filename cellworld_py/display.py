@@ -1,3 +1,4 @@
+import numpy
 from matplotlib.patches import RegularPolygon
 import matplotlib.pyplot as plt
 from .world import *
@@ -55,4 +56,4 @@ class Display:
             if agent in colors:
                 color = colors[agent]
             for i in range(len(x)-1):
-                self.ax.plot([x[i],x[i+1]], [y[i],y[i+1]], color=color if type(color) is str else color[i], alpha=.5, linewidth=3)
+                self.ax.plot([x[i], x[i+1]], [y[i],y[i+1]], color=color[i] if type(color) is numpy.ndarray else color, alpha=.5, linewidth=3)

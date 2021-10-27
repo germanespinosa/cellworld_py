@@ -160,6 +160,7 @@ def test_experiment():
     src_space = Space(center=Location(0.5, 0.5), shape=Shape(6), transformation=Transformation(1, 30))
     r = (21.0 + 1.0 / 3.0)
     wi = World_implementation.create(wc, space=src_space, cell_transformation=Transformation(size=1.15470053837925/r, rotation=0), relative_locations_transformations=Transformation_list(n=6, rotation=-90, size=1/r))
+    open("hexagonal.canonical.json", "w").write(str(wi))
     from matplotlib import pyplot as plt
     o = Cell_group_builder.get_from_name("hexagonal", "10_05", "occlusions")
     w = World.get_from_parameters(wc, wi, o)
@@ -178,7 +179,6 @@ def test_experiment():
     norm = mpl.colors.Normalize(vmin=0, vmax=2)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-
     cbar = plt.colorbar(sm, ticks=np.linspace(0, 2, 50), boundaries=np.arange(-0.05, 2.1, .1))
     cbar.ax.set_yticklabels([])
 
