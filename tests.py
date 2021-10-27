@@ -1,5 +1,6 @@
 from cellworld_py import *
-
+import matplotlib as mpl
+import numpy as np
 
 def test_coordinates():
     print("testing coordinates: ", end="")
@@ -83,7 +84,7 @@ def test_transformation():
     assert (Transformation(1.0, 2.0).rotation == 2.0)
     assert (Json_get("{\"size\":1.0,\"rotation\":2.0}", Transformation) == Transformation(1.0, 2.0))
     assert (str(Transformation(1.0, 2.0)) == "{\"size\":1.0,\"rotation\":2.0}")
-    assert (str(Transformation.get_transformations(4,0,1)) == "[{\"size\":1.0,\"rotation\":0.0},{\"size\":1.0,\"rotation\":90.0},{\"size\":1.0,\"rotation\":180.0},{\"size\":1.0,\"rotation\":270.0}]")
+    assert (str(Transformation_list(n=4, size=1, rotation=0)) == "[{\"size\":1.0,\"rotation\":0.0},{\"size\":1.0,\"rotation\":90.0},{\"size\":1.0,\"rotation\":180.0},{\"size\":1.0,\"rotation\":270.0}]")
     print("ok")
 
 
@@ -127,35 +128,74 @@ def test_world_implementation():
     check_type(wi.cell_transformation, Transformation, "wrong type for cell_transformation")
     print("ok")
 
+
 def test_world():
     print("testing world: ", end="")
     w = World.get_from_parameters_names("hexagonal", "canonical")
     w = World.get_from_parameters_names("hexagonal", "canonical")
-    w = World.get_from_parameters_names("hexagonal", "canonical", "00_00")
+    w = World.get_from_parameters_names("hexagonal", "canonical", "10_05")
     print("ok")
+    occlusions = w.cells.where("occluded", True)
+    print (occlusions)
+
 
 def test_display():
-    wc = World_configuration.get_from_name("hexagonal")
-    src_space = Space(center=Location(0, 0), shape=Shape(6), transformation=Transformation(21.0 + 1.0 / 3.0, 30))
-    wi = World_implementation.create(wc, space=src_space, cell_transformation=Transformation(size=1, rotation=0), relative_locations_transformations=(6, -90, 1))
-    from matplotlib import pyplot as plt
     print("testing display: ", end="")
-    o = Cell_group_builder.get_from_name("hexagonal", "00_00", "occlusions")
+    wc = World_configuration.get_from_name("hexagonal")
+    src_space = Space(center=Location(0, 0), shape=Shape(6), transformation=Transformation(1, 30))
+    r = (21.0 + 1.0 / 3.0)
+    wi = World_implementation.create(wc, space=src_space, cell_transformation=Transformation(size=1.15470053837925/r, rotation=0), relative_locations_transformations=Transformation_list(n=6, rotation=-90, size=1/r))
+    from matplotlib import pyplot as plt
+    o = Cell_group_builder.get_from_name("hexagonal", "10_08", "occlusions")
     w = World.get_from_parameters(wc, wi, o)
-    d = Display(w)
+    d = Display(w, show_axes=True)
     plt.show()
     print("ok")
 
 
-test_coordinates()
-test_coordinates_list()
-test_location()
-test_location_list()
-test_shape()
-test_transformation()
-test_space()
-test_cell()
-test_world_configuration()
-test_world_implementation()
-test_world()
-test_display()
+def test_experiment():
+    print("testing experiment: ", end="")
+    e = Experiment.get_from_file("test_trajectory.json")
+    wc = World_configuration.get_from_name("hexagonal")
+    src_space = Space(center=Location(0.5, 0.5), shape=Shape(6), transformation=Transformation(1, 30))
+    r = (21.0 + 1.0 / 3.0)
+    wi = World_implementation.create(wc, space=src_space, cell_transformation=Transformation(size=1.15470053837925/r, rotation=0), relative_locations_transformations=Transformation_list(n=6, rotation=-90, size=1/r))
+    from matplotlib import pyplot as plt
+    o = Cell_group_builder.get_from_name("hexagonal", "10_05", "occlusions")
+    w = World.get_from_parameters(wc, wi, o)
+    d = Display(w, show_axes=True, background_color="black", cell_edge_color="white", habitat_edge_color="white")
+    # for epi in e.episodes:
+    max_vel = 0
+    for episode in e.episodes:
+        unique_steps = episode.trajectories.get_agent_trajectory("human").get_unique_steps()
+        human_velocity = unique_steps.get_filtered_velocities(.9)["human"]
+        max_vel = max(human_velocity + [max_vel])
+        vel_color_index = [v/max(human_velocity) for v in human_velocity]
+        cmap = plt.cm.jet(vel_color_index)
+        d.add_trajectories(unique_steps, {"human": cmap})
+
+    cmap = plt.cm.jet
+    norm = mpl.colors.Normalize(vmin=0, vmax=2)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+
+    cbar = plt.colorbar(sm, ticks=np.linspace(0, 2, 50), boundaries=np.arange(-0.05, 2.1, .1))
+    cbar.ax.set_yticklabels([])
+
+    plt.show()
+
+
+
+# test_coordinates()
+# test_coordinates_list()
+# test_location()
+# test_location_list()
+# test_shape()
+# test_transformation()
+# test_space()
+# test_cell()
+# test_world_configuration()
+# test_world_implementation()
+# test_world()
+#test_display()
+test_experiment()

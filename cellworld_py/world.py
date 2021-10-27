@@ -1,7 +1,7 @@
 from .util import *
 from .location import Location, Location_list
 from .coordinates import Coordinates, Coordinates_list
-from .shape import Shape, Transformation, Space
+from .shape import Shape, Transformation, Space, Transformation_list
 from .cell import Cell, Cell_group_builder, Cell_group, Cell_map
 from .util import check_type
 
@@ -39,8 +39,7 @@ class World_implementation(Json_object):
         if relative_locations is None:
             if relative_locations_transformations is None:
                 raise "either relative_locations or relative_locations_transformations must be used"
-            if type(relative_locations_transformations) is tuple:
-                relative_locations_transformations = Transformation.get_transformations(*relative_locations_transformations)
+            check_type(relative_locations_transformations,Transformation_list, "wrong type for relative_locations_transformations")
             relative_locations = World_implementation.create_cell_locations(relative_locations_transformations)
             if len(relative_locations) != len(world_configuration.connection_pattern):
                 raise "number of transformations must match the number of connections in the connection pattern"
@@ -125,7 +124,7 @@ class World:
 
         if occlusions:
             check_type(occlusions, Cell_group_builder, "incorrect type for occlusions")
-            for cell_id in occlusions.cell_ids:
+            for cell_id in occlusions:
                 w.cells[cell_id].occluded = True
         return w
 

@@ -13,12 +13,13 @@ class Transformation(Json_object):
         self.size = float(size)
         self.rotation = float(rotation)
 
-    @staticmethod
-    def get_transformations(n, rotation=0, size=1):
-        ts = Json_list(allowedType=Transformation)
-        for a in range(n):
-            ts.append(Transformation(size, rotation + a * (360 / n)))
-        return ts
+
+class Transformation_list(Json_list):
+    def __init__(self, iterable=None, n=None, size=0.0, rotation=0.0):
+        Json_list.__init__(self, iterable, allowedType=Transformation)
+        if n:
+            for a in range(n):
+                self.append(Transformation(float(size), float(rotation) + float(a) * (360.0 / float(n))))
 
 
 class Space(Json_object):

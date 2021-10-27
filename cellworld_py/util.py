@@ -7,10 +7,15 @@ global cellworld_data_base_uri
 cellworld_data_base_uri = "https://raw.githubusercontent.com/germanespinosa/cellworld_data/master/"
 
 
-def get_resource(resource_type, key0, *argv ):
+def get_resource(resource_type, key0, *argv):
     resource_uri = cellworld_data_base_uri + resource_type + "/" + key0
     for arg in argv:
         resource_uri += "." + arg
+    response = requests.get(resource_uri)
+    return json.loads(response.text)
+
+
+def get_web_json(resource_uri):
     response = requests.get(resource_uri)
     return json.loads(response.text)
 
@@ -149,6 +154,14 @@ class Json_list(list):
         for i in self:
             l.append(vars(i)[m])
         return l
+
+    def where(self, m, v, o="=="):
+        nl = type(self)()
+        for i in self:
+            e = "'%s' %s '%s'" % (str(vars(i)[m]), o, str(v))
+            if eval(e):
+                nl.append(i)
+        return nl
 
 
 def Json_get(j, t):

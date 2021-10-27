@@ -37,18 +37,10 @@ class Cell_group(Json_list):
                 self.append(world.cells[cell_id])
 
     def free_cells(self):
-        cg = Cell_group()
-        for cell in self:
-            if not cell.occluded:
-                cg.append(cell)
-        return cg
+        return self.where("occluded", False)
 
     def occluded_cells(self):
-        cg = Cell_group()
-        for cell in self:
-            if cell.occluded:
-                cg.append(cell)
-        return cg
+        return self.where("occluded", True)
 
     def builder(self):
         cgb = Cell_group_builder()
