@@ -58,7 +58,7 @@ class Trajectories(Json_list):
         last_time_stamp = {}
         for s in self:
             if s.agent_name not in velocities:
-                velocities[s.agent_name] = Velocities(allowedType=float)
+                velocities[s.agent_name] = Velocities()
                 velocities[s.agent_name].append(0.0)
             else:
                 time_dif = s.time_stamp - last_time_stamp[s.agent_name]
