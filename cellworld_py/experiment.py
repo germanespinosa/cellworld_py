@@ -34,11 +34,12 @@ class Velocities(Json_list):
         check_type(a, float, "wrong type for a")
         if a <= 0:
             raise ArithmeticError("filter parameter should be > 0")
+        threshold = sum(self)/len(self) * a
         filtered = Velocities()
         last = self[0]
         next_good = False
         for v in self:
-            if last == 0 or next_good or abs(v-last)/last <= a:
+            if abs(v-last) <= threshold:
                 next_good = False
                 filtered.append(v)
             else:
