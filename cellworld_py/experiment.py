@@ -42,10 +42,10 @@ class Velocities(Json_list):
             if abs(v-last) <= threshold:
                 next_good = False
                 filtered.append(v)
+                last = v
             else:
                 filtered.append(last)
                 next_good = True
-            last = v
         return filtered
 
 
