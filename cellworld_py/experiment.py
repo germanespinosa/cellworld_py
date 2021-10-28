@@ -38,7 +38,7 @@ class Velocities(Json_list):
         last = self[0]
         next_good = False
         for v in self:
-            if next_good or abs(v-last)/last <= a:
+            if last == 0 or next_good or abs(v-last)/last <= a:
                 next_good = False
                 filtered.append(v)
             else:

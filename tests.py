@@ -161,7 +161,6 @@ def test_experiment():
     src_space = Space(center=Location(0.5, 0.5), shape=Shape(6), transformation=Transformation(1, 30))
     r = (21.0 + 1.0 / 3.0)
     wi = World_implementation.create(wc, space=src_space, cell_transformation=Transformation(size=1.15470053837925/r, rotation=0), relative_locations_transformations=Transformation_list(n=6, rotation=-90, size=1/r))
-    open("hexagonal.canonical.json", "w").write(str(wi))
     from matplotlib import pyplot as plt
     o = Cell_group_builder.get_from_name("hexagonal", "10_05", "occlusions")
     w = World.get_from_parameters(wc, wi, o)
@@ -170,7 +169,7 @@ def test_experiment():
     max_vel = 0
     for episode in e.episodes:
         unique_steps = episode.trajectories.get_agent_trajectory("human").get_unique_steps()
-        human_velocity = unique_steps.get_filtered_velocities(.9, 1.0)["human"]
+        human_velocity = unique_steps.get_filtered_velocities(.9)["human"]
         max_vel = max(human_velocity + [max_vel])
         vel_color_index = [v/max(human_velocity) for v in human_velocity]
         cmap = plt.cm.jet(vel_color_index)
