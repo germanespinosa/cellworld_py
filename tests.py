@@ -170,7 +170,7 @@ def test_experiment():
     max_vel = 0
     for episode in e.episodes:
         unique_steps = episode.trajectories.get_agent_trajectory("human").get_unique_steps()
-        human_velocity = unique_steps.get_filtered_velocities(.9)["human"]
+        human_velocity = unique_steps.get_filtered_velocities(.9, 1.0)["human"]
         max_vel = max(human_velocity + [max_vel])
         vel_color_index = [v/max(human_velocity) for v in human_velocity]
         cmap = plt.cm.jet(vel_color_index)
@@ -211,5 +211,5 @@ def test_velocities():
 # test_world_implementation()
 # test_world()
 #test_display()
-#test_experiment()
-test_velocities()
+test_experiment()
+#test_velocities()
