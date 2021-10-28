@@ -75,8 +75,8 @@ class Trajectories(Json_list):
         for agent_name in avs:
             if outliers:
                 avs[agent_name] = avs[agent_name].outliers_filter(outliers)
-        if complementary:
-            avs[agent_name] = avs[agent_name].complementary_filter(complementary)
+            if complementary:
+                avs[agent_name] = avs[agent_name].complementary_filter(complementary)
         return avs
 
     def get_unique_steps(self):
