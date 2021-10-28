@@ -73,10 +73,10 @@ class Trajectories(Json_list):
     def get_filtered_velocities(self, complementary=None, outliers=None):
         avs = self.get_velocities()
         for agent_name in avs:
-            if complementary:
-                avs[agent_name] = avs[agent_name].complementary_filter(complementary)
             if outliers:
                 avs[agent_name] = avs[agent_name].outliers_filter(outliers)
+        if complementary:
+            avs[agent_name] = avs[agent_name].complementary_filter(complementary)
         return avs
 
     def get_unique_steps(self):
