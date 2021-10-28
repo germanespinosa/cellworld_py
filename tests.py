@@ -2,6 +2,7 @@ from cellworld_py import *
 import matplotlib as mpl
 import numpy as np
 
+
 def test_coordinates():
     print("testing coordinates: ", end="")
     assert (Coordinates(1, 2).x == Coordinates(1, 3).x)
@@ -184,7 +185,19 @@ def test_experiment():
 
     plt.show()
 
-
+def test_velocities():
+    v = Velocities()
+    v.append(1.0)
+    v.append(2.0)
+    v.append(5.0)
+    v.append(1000.0)
+    fv = v.complementary_filter(.9)
+    print(fv)
+    assert (fv[0] == 1.0)
+    assert (fv[1] == 1.1)
+    assert (fv[2] == 1.49)
+    rv = fv.outliers_filter(.3)
+    print(rv)
 
 # test_coordinates()
 # test_coordinates_list()
@@ -198,4 +211,5 @@ def test_experiment():
 # test_world_implementation()
 # test_world()
 #test_display()
-test_experiment()
+#test_experiment()
+test_velocities()

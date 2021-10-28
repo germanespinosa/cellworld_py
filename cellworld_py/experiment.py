@@ -14,6 +14,40 @@ class Step(Json_object):
         self.location = location
 
 
+class Velocities(Json_list):
+    def __init__(self, iterable=None):
+        Json_list.__init__(self, iterable, allowedType=float)
+
+    def complementary_filter(self, a): # complementary filter
+        check_type(a, float, "wrong type for a")
+        if a <= 0 or a >= 1:
+            raise ArithmeticError("filter parameter should be > 0 and < 1")
+        filtered = Velocities()
+        last = self[0]
+        for v in self:
+            nv = (a * last + (1 - a) * v)
+            last = nv
+            filtered.append(nv)
+        return filtered
+
+    def outliers_filter(self, a):
+        check_type(a, float, "wrong type for a")
+        if a <= 0:
+            raise ArithmeticError("filter parameter should be > 0")
+        filtered = Velocities()
+        last = self[0]
+        next_good = False
+        for v in self:
+            if next_good or abs(v-last)/last <= a:
+                next_good = False
+                filtered.append(v)
+            else:
+                next_good = True
+            last = v
+        return filtered
+
+
+
 class Trajectories(Json_list):
     def __init__(self, iterable=None):
         Json_list.__init__(self, iterable, allowedType=Step)
@@ -24,7 +58,7 @@ class Trajectories(Json_list):
         last_time_stamp = {}
         for s in self:
             if s.agent_name not in velocities:
-                velocities[s.agent_name] = Json_list(allowedType=float)
+                velocities[s.agent_name] = Velocities(allowedType=float)
                 velocities[s.agent_name].append(0.0)
             else:
                 time_dif = s.time_stamp - last_time_stamp[s.agent_name]
@@ -34,18 +68,14 @@ class Trajectories(Json_list):
             last_time_stamp[s.agent_name] = s.time_stamp
         return velocities
 
-    def get_filtered_velocities(self, a):
+    def get_filtered_velocities(self, complementary=None, outliers=None):
         avs = self.get_velocities()
-        fv = {}
         for agent_name in avs:
-            vs = avs[agent_name]
-            l=vs[0]
-            fv[agent_name]= []
-            for v in vs:
-                nv = (a*l+(1-a)*v)
-                l=nv
-                fv[agent_name].append(nv)
-        return fv
+            if complementary:
+                avs[agent_name] = avs[agent_name].complementary_filter(complementary)
+            if outliers:
+                avs[agent_name] = avs[agent_name].outliers_filter(outliers)
+        return avs
 
     def get_unique_steps(self):
         unique_steps = Trajectories()
