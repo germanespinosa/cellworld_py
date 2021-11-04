@@ -6,12 +6,14 @@ from .location import *
 
 
 class Step(Json_object):
-    def __init__(self, time_stamp=0.0, agent_name="", frame=0, coordinates=Coordinates(0,0), location=Location(0,0)):
+    def __init__(self, time_stamp=0.0, agent_name="", frame=0, coordinates=Coordinates(0,0), location=Location(0,0), rotation=0.0, data=""):
         self.time_stamp = time_stamp
         self.agent_name = agent_name
         self.frame = frame
         self.coordinates = coordinates
         self.location = location
+        self.rotation = rotation
+        self.data = data
 
 
 class Velocities(Json_list):
