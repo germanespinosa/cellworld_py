@@ -2,7 +2,7 @@ import zipfile
 import requests
 
 
-def download (url, path = None):
+def download(url, path=None):
     web_get = requests.get(url)
     if not path:
         path = url.split("/")[-1]
@@ -16,8 +16,11 @@ def extract(file_name):
     zip_ref.close()  # close file
 
 
-def install(version = ""):
+def install(version=""):
     if version:
         version = "_" + version
-    download("https://github.com/germanespinosa/cellworld_py/raw/master/build/cellworld_py" + version + ".zip", "cellworld_py.zip")
+    try:
+        download("https://github.com/germanespinosa/cellworld_py/raw/master/build/cellworld_py" + version + ".zip", "cellworld_py.zip")
+    except:
+        raise ValueError('Failed to intall cellworld_py  version ' + version)
     extract("cellworld_py.zip")
