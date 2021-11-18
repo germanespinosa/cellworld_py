@@ -1,6 +1,6 @@
 import zipfile
 import requests
-
+import os
 
 def download(url, path=None):
     web_get = requests.get(url)
@@ -24,3 +24,4 @@ def install(version=""):
     except:
         raise ValueError('Failed to intall cellworld_py  version ' + version)
     extract("cellworld_py.zip")
+    os.remove("cellworld_py.zip")
