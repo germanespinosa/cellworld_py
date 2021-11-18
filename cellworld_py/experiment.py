@@ -116,9 +116,11 @@ class Episode_list(Json_list):
 
 
 class Experiment(Json_object):
-    def __init__(self, name="", world_name="", subject_name="", duration=0.0, start_time="", episodes=Episode_list()):
+    def __init__(self, name="", world_configuration_name="", world_implementation_name="", occlusions="", subject_name="", duration=0, start_time="", episodes=Episode_list()):
         self.name = name
-        self.world_name = world_name
+        self.world_configuration_name = world_configuration_name
+        self.world_implementation_name = world_implementation_name
+        self.occlusions = occlusions
         self.subject_name = subject_name
         self.duration = duration
         self.start_time = start_time
