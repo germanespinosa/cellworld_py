@@ -22,7 +22,16 @@ def get_web_json(resource_uri):
 
 def check_type(v, t, m):
     if not isinstance(v, t):
-        raise m
+        raise TypeError(m)
+
+
+def check_types(v, ts, m):
+    r = False
+    for t in ts:
+        if isinstance(v, t):
+            r = True
+    if not r:
+        raise TypeError(m)
 
 
 def normalize(angle):
@@ -196,3 +205,49 @@ def Json_get(j, t):
         return l
     else:
         raise TypeError("wrong type for t")
+
+
+class Message(Json_object):
+    def __init__(self, header="", body=""):
+        self.header = header
+        self.body = str(body)
+
+    def get_body(self, t):
+        return Json_get(self.body, t)
+
+    def set_body(self, v):
+        self.body = str(v)
+
+
+class Message_list(Json_list):
+    def __init__(self, iterable=None):
+        Json_list.__init__(self, iterable, allowedType=Message)
+
+    def queue(self, message):
+        check_type(message, Message, "wrong type for message")
+        self.append(message)
+
+    def dequeue(self):
+        if len(self):
+            message = self[0]
+            del self[0]
+            return message
+        return None
+
+    def get_message(self, header):
+        for i in range(len(self)):
+            if self[i].header == header:
+                message = self[i]
+                del self[i]
+                return message
+        return None
+
+    def get_last_message(self, header):
+        message = None
+        for i in range(len(self)):
+            if self[i].header == header:
+                message = self[i]
+                del self[i]
+        return message
+
+

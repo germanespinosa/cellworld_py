@@ -1,7 +1,7 @@
 from cellworld_py import *
 import matplotlib as mpl
 import numpy as np
-
+import time
 
 def test_coordinates():
     print("testing coordinates: ", end="")
@@ -198,6 +198,81 @@ def test_velocities():
     rv = fv.outliers_filter(.3)
     print(rv)
 
+
+def test_message_router():
+    class routing_test:
+        def __init__(self, i):
+            self.i = i
+            pass
+
+        def handler_1(self, m):
+            return self.i, 1
+
+        def handler_2(self, m):
+            return self.i, 2
+
+    rt1 = routing_test(1)
+    rt2 = routing_test(2)
+    mr = Message_router()
+    mr.add_route("1$", rt1.handler_1)
+    mr.add_route("2$", rt2.handler_2)
+    assert (mr.route(Message("test1", "route 1")) == [(1, 1)])
+    assert (mr.route(Message("test2", "route 2")) == [(2, 2)])
+
+
+def test_message_queue():
+    ml = Message_list()
+    assert (len(ml) == 0)
+    ml.queue(Message("a", "a"))
+    assert (len(ml) == 1)
+    ml.queue(Message("a", "b"))
+    assert (len(ml) == 2)
+    m = ml.dequeue()
+    assert (m.header == "a" and m.body == "a")
+    assert (len(ml) == 1)
+    m = ml.dequeue()
+    assert (m.header == "a" and m.body == "b")
+    assert (len(ml) == 0)
+
+
+def test_message_server():
+    class routing_test:
+        def __init__(self, i):
+            self.i = i
+            pass
+
+        def handler_1(self, m):
+            print(self.i, 1)
+            return self.i, 1
+
+        def handler_2(self, m):
+            print(self.i, 2)
+            return Message("response", 2)
+
+    def unrouted(message):
+        print("unrouted", message)
+
+    def response(message):
+        print("response", message)
+
+    rt1 = routing_test(1)
+    rt2 = routing_test(2)
+
+    ms = Message_server()
+    ms.router.unrouted_message = unrouted
+    ms.router.add_route("1$", rt1.handler_1)
+    ms.router.add_route("2$", rt1.handler_2)
+    ms.start(5000)
+    mc = Message_client("127.0.0.1", 5000)
+    mc.router.unrouted_message = response
+    mc.start()
+    for i in range(300):
+        time.sleep(.1)
+        mc.connection.send(Message("test%i" % (i % 3), "route 1"))
+        print(i)
+    ms.stop()
+
+
 # test_coordinates()
 # test_coordinates_list()
 # test_location()
@@ -209,6 +284,9 @@ def test_velocities():
 # test_world_configuration()
 # test_world_implementation()
 # test_world()
-#test_display()
-test_experiment()
-#test_velocities()
+# test_display()
+# test_experiment()
+# test_velocities()
+# test_message_router()
+#test_message_queue()
+test_message_server()
