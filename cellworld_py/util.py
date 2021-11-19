@@ -249,5 +249,3 @@ class Message_list(Json_list):
                 message = self[i]
                 del self[i]
         return message
-
-

@@ -289,4 +289,5 @@ def test_message_server():
 # test_velocities()
 # test_message_router()
 #test_message_queue()
-test_message_server()
+#test_message_server()
+print (version())

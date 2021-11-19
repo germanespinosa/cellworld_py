@@ -17,6 +17,12 @@ def extract(file_name):
 
 
 def install(version=""):
+    try:
+        import cellworld_py
+    except:
+        pass
+
+
     if version:
         version = "_" + version
     try:
