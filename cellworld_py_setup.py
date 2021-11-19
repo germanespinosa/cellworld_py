@@ -31,12 +31,16 @@ def install(version="", force=False):
     if is_installed and not force:
         return
 
+    version_v = ""
+
     if version:
-        version = "_" + version
+        version_v = "_" + version
+
     try:
-        download("https://github.com/germanespinosa/cellworld_py/raw/master/build/cellworld_py" + version + ".zip", "cellworld_py.zip")
+        download("https://github.com/germanespinosa/cellworld_py/raw/master/build/cellworld_py" + version_v + ".zip", "cellworld_py.zip")
     except:
         raise ValueError('cellworld_py version ' + version + 'installation failed')
+
     extract("cellworld_py.zip")
     os.remove("cellworld_py.zip")
     print('cellworld_py version ' + version + ' installed')
