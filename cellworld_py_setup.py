@@ -16,12 +16,20 @@ def extract(file_name):
     zip_ref.close()  # close file
 
 
-def install(version=""):
+def install(version="", force=False):
+    is_installed = False
     try:
         import cellworld_py
     except:
         pass
+    try:
+        if cellworld_py.version() == version:
+            is_installed = True
+    except:
+        pass
 
+    if is_installed and not force:
+        return
 
     if version:
         version = "_" + version
