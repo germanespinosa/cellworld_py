@@ -74,7 +74,7 @@ class Json_object:
                 s += ","
             s += "\"%s\":" % k
             if isinstance(v[k], str):
-                s += "\"%s\"" % v[k]
+                s += "%s" % json.dumps(v[k])
             elif isinstance(v[k], bool):
                 s += "%s" % str(v[k]).lower()
             else:
