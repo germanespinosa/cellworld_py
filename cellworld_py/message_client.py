@@ -1,6 +1,6 @@
 import socket
 from threading import Thread
-from .util import Message, check_type
+from .util import Message, check_type, Message_list
 from .message_connection import Message_connection
 from .message_router import Message_router
 
@@ -17,6 +17,7 @@ class Message_client:
         s.connect(self.parameters)
         self.connection = Message_connection(s, self.failed_messages)
         self.thread = None
+        self.pending_messages = Message_list()
 
     def start(self):
         self.thread = Thread(target=self.__proc__)
@@ -41,3 +42,8 @@ class Message_client:
                     for response in responses:
                         if isinstance(response, Message):
                             self.connection.send(response)
+                else:
+                    if self.unrouted_messages:
+                        self.unrouted_messages(message)
+                    else:
+                        self.pending_messages.queue(message)
