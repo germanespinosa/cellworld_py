@@ -19,9 +19,10 @@ class Message_client:
         self.thread = None
 
     def start(self):
-        self.running = True
         self.thread = Thread(target=self.__proc__)
         self.thread.start()
+        while not self.running:
+            pass
 
     def stop(self):
         self.running = False
@@ -31,7 +32,8 @@ class Message_client:
         pass
 
     def __proc__(self):
-        while self.running and self.connection.active():
+        self.running = True
+        while self.running and self.connection.state == Message_connection.State.Open:
             message = self.connection.receive()
             if message:
                 responses = self.router.route(message)

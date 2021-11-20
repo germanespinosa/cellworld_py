@@ -19,17 +19,22 @@ class Message_server:
     def start(self, port):
         self.server.bind((self.ip, port))
         self.server.listen()
-        self.server.settimeout(1)
-        self.running = True
+        self.server.settimeout(0.001)
         self.thread.start()
+        while not self.running:
+            pass
+
 
     def stop(self):
         self.running = False
         for c, t in zip(self.connections, self.threads):
             c.close()
             t.join()
+        self.thread.join()
+        self.server.close()
 
     def __proc__(self):
+        self.running = True
         while self.running:
             try:
                 client, address = self.server.accept()
@@ -48,7 +53,7 @@ class Message_server:
 
     def __client_proc__(self, connection):
         check_type(connection, Message_connection, "incorrect type for connection")
-        while connection.active():
+        while connection.state == Message_connection.State.Open:
             message = connection.receive()
             if message:
                 responses = self.router.route(message)

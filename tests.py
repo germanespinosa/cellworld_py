@@ -235,25 +235,41 @@ def test_message_queue():
     assert (len(ml) == 0)
 
 
-def test_message_server():
+unrouted_counter = 0
+responses_counter = 0
+
+def test_message_server(m):
     class routing_test:
         def __init__(self, i):
             self.i = i
+            self.h1 = 0
+            self.h2 = 0
+            self.handled = []
             pass
 
         def handler_1(self, m):
-            print(self.i, 1)
+            self.h1 += 1
+            self.handled.append(m.body)
             return self.i, 1
 
         def handler_2(self, m):
-            print(self.i, 2)
+            self.h2 += 1
+            self.handled.append(m.body)
             return Message("response", 2)
 
     def unrouted(message):
-        print("unrouted", message)
+        global unrouted_counter
+        unrouted_counter += 1
 
     def response(message):
-        print("response", message)
+        global responses_counter
+        responses_counter += 1
+
+    global unrouted_counter
+    global responses_counter
+
+    unrouted_counter = 0
+    responses_counter = 0
 
     rt1 = routing_test(1)
     rt2 = routing_test(2)
@@ -261,16 +277,80 @@ def test_message_server():
     ms = Message_server()
     ms.router.unrouted_message = unrouted
     ms.router.add_route("1$", rt1.handler_1)
-    ms.router.add_route("2$", rt1.handler_2)
+    ms.router.add_route("2$", rt2.handler_2)
     ms.start(5000)
     mc = Message_client("127.0.0.1", 5000)
     mc.router.unrouted_message = response
     mc.start()
-    for i in range(300):
-        time.sleep(.1)
-        mc.connection.send(Message("test%i" % (i % 3), "route 1"))
-        print(i)
+    for i in range(m * 2):
+        mc.connection.send(Message("test%i" % ((i % 2) + 1), str(i)))
+    p = 0
+    while rt1.h1 + rt1.h2 + rt2.h1 + rt2.h2 + unrouted_counter < m * 2:
+        pass
+
+    while responses_counter < m:
+        pass
+
+    mc.stop()
+    mc.connection.close()
     ms.stop()
+    assert(rt1.h1 == m)
+    assert(rt1.h2 == 0)
+    assert(rt2.h1 == 0)
+    assert(rt2.h2 == m)
+    assert(unrouted_counter == 0)
+
+def test_message_client(m):
+    class routing_test:
+        def __init__(self, i):
+            self.i = i
+            self.h1 = 0
+            self.h2 = 0
+            self.handled = []
+            pass
+
+        def handler_1(self, m):
+            self.h1 += 1
+            self.handled.append(m.body)
+
+        def handler_2(self, m):
+            self.h2 += 1
+            self.handled.append(m.body)
+
+    def unrouted(message):
+        global unrouted_counter
+        unrouted_counter += 1
+
+    global unrouted_counter
+    global responses_counter
+
+    unrouted_counter = 0
+    responses_counter = 0
+
+    rt1 = routing_test(1)
+    rt2 = routing_test(2)
+
+    ms = Message_server()
+    ms.router.unrouted_message = unrouted
+    ms.router.add_route("1$", rt1.handler_1)
+    ms.router.add_route("2$", rt2.handler_2)
+    ms.start(5000)
+    for i in range(m * 2):
+        mc = Message_client("127.0.0.1", 5000)
+        mc.connection.send(Message("test%i" % ((i % 2) + 1), str(i)))
+        mc.connection.close()
+
+    p = 0
+    while rt1.h1 + rt1.h2 + rt2.h1 + rt2.h2 + unrouted_counter < m * 2:
+        pass
+
+    ms.stop()
+    assert(rt1.h1 == m)
+    assert(rt1.h2 == 0)
+    assert(rt2.h1 == 0)
+    assert(rt2.h2 == m)
+    assert(unrouted_counter == 0)
+
 
 
 # test_coordinates()
@@ -289,5 +369,6 @@ def test_message_server():
 # test_velocities()
 # test_message_router()
 #test_message_queue()
-#test_message_server()
-print (version())
+#[test_message_server(20) for i in range(10)]
+#[test_message_client(20) for i in range(10)]
+#print (version())
