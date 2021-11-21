@@ -1,11 +1,10 @@
 import math
-
 import requests
 import json
-
 global cellworld_data_base_uri
-cellworld_data_base_uri = "https://raw.githubusercontent.com/germanespinosa/cellworld_data/master/"
+from datetime import datetime, timedelta
 
+cellworld_data_base_uri = "https://raw.githubusercontent.com/germanespinosa/cellworld_data/master/"
 
 def get_resource(resource_type, key0, *argv):
     resource_uri = cellworld_data_base_uri + resource_type + "/" + key0
@@ -19,6 +18,13 @@ def get_web_json(resource_uri):
     response = requests.get(resource_uri)
     return json.loads(response.text)
 
+
+class Time_out:
+    def __init__(self, seconds=1.0):
+        self.end_time = datetime.now() + timedelta(seconds=seconds)
+
+    def __bool__(self):
+        return self.end_time > datetime.now()
 
 def check_type(v, t, m):
     if not isinstance(v, t):
