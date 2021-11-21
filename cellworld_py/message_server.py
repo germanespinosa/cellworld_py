@@ -63,3 +63,4 @@ class Message_server:
                         else:
                             if response:
                                 response_message = Message(message.header+"_result", str(response))
+                                connection.send(response_message)
