@@ -50,7 +50,6 @@ class Message_server:
                 print("Server: socked closed unexpectedly")
                 self.running = False
 
-
     def __client_proc__(self, connection):
         check_type(connection, Message_connection, "incorrect type for connection")
         while connection.state == Message_connection.State.Open:
@@ -61,3 +60,6 @@ class Message_server:
                     for response in responses:
                         if isinstance(response, Message):
                             connection.send(response)
+                        else:
+                            if response:
+                                response_message = Message(message.header+"_result", str(response))
