@@ -234,6 +234,12 @@ class Message_list(Json_list):
             return message
         return None
 
+    def contains(self, header):
+        for message in self:
+            if message.header == header:
+                return True
+        return False
+
     def get_message(self, header):
         for i in range(len(self)):
             if self[i].header == header:
