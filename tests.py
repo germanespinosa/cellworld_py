@@ -11,6 +11,7 @@ def test_coordinates():
     assert ('{"x":1,"y":2}' == str(Coordinates(1, 2)))
     assert ('{"x":1,"y":2}' == str(Coordinates(1, 2)))
     assert (Json_get({"x": 1, "y": 2}, Coordinates) == Coordinates(1, 2))
+    assert (Coordinates(10, 15).format("x={x} and y={y}") == "x=10 and y=15")
     print("ok")
 
 
@@ -353,7 +354,7 @@ def test_message_client(m):
 
 
 
-# test_coordinates()
+test_coordinates()
 # test_coordinates_list()
 # test_location()
 # test_location_list()
@@ -369,10 +370,11 @@ def test_message_client(m):
 # test_velocities()
 # test_message_router()
 #test_message_queue()
-[test_message_server(20) for i in range(10)]
-[test_message_client(20) for i in range(10)]
+#[test_message_server(20) for i in range(10)]
+#[test_message_client(20) for i in range(10)]
 #print (version())
 #
 # while Time_out(5):
 #     print(1)
 #     time.sleep(1)
+

@@ -99,6 +99,10 @@ class Json_object:
                 return False
         return True
 
+    def format(self, format_string):
+        v = vars(self)
+        return format_string.format(**v)
+
 
 class Json_list(list):
 
