@@ -60,6 +60,9 @@ class Message_server:
                     for response in responses:
                         if isinstance(response, Message):
                             connection.send(response)
+                        elif isinstance(response, bool):
+                            response_message = Message(message.header + "_result", "ok" if response else "fail")
+                            connection.send(response_message)
                         else:
                             if response:
                                 response_message = Message(message.header+"_result", str(response))

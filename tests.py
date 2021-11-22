@@ -369,6 +369,10 @@ def test_message_client(m):
 # test_velocities()
 # test_message_router()
 #test_message_queue()
-#[test_message_server(20) for i in range(10)]
-#[test_message_client(20) for i in range(10)]
+[test_message_server(20) for i in range(10)]
+[test_message_client(20) for i in range(10)]
 #print (version())
+#
+# while Time_out(5):
+#     print(1)
+#     time.sleep(1)

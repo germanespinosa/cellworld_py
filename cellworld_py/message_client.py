@@ -42,8 +42,10 @@ class Message_client:
                     for response in responses:
                         if isinstance(response, Message):
                             self.connection.send(response)
-                else:
-                    if self.unrouted_messages:
-                        self.unrouted_messages(message)
-                    else:
-                        self.pending_messages.queue(message)
+                        elif isinstance(response, bool):
+                            response_message = Message(message.header + "_result", "ok" if response else "fail")
+                            self.connection.send(response_message)
+                        else:
+                            if response:
+                                response_message = Message(message.header+"_result", str(response))
+                                self.connection.send(response_message)

@@ -67,3 +67,5 @@ class Message_connection:
                             if self.failed_message:
                                 self.failed_message(message_str)
         return self.pending_messages.dequeue()
+
+
