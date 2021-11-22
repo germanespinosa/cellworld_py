@@ -100,8 +100,7 @@ class Json_object:
         return True
 
     def format(self, format_string):
-        v = vars(self)
-        return format_string.format(**v)
+        return format_string.format(**vars(self))
 
 
 class Json_list(list):
