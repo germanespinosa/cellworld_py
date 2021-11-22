@@ -97,6 +97,8 @@ def test_space():
     assert (Space(Location(1, 2), Shape(6), Transformation(0, 1)).transformation == Transformation(0, 1))
     assert (str(Space(Location(1, 2), Shape(6), Transformation(0, 1))) == '{"center":{"x":1.0,"y":2.0},"shape":{"sides":6},"transformation":{"size":0.0,"rotation":1.0}}')
     assert (Json_get('{"center":{"x":1.0,"y":2.0},"shape":{"sides":6},"transformation":{"size":0.0,"rotation":1.0}}',Space) == Space(Location(1, 2), Shape(6), Transformation(0, 1)))
+    space = Space(Location(1, 2), Shape(6), Transformation(0, 1))
+    print(space.format("the center is in {center:x={x} and y={y}} with {shape:{sides}} sides and the transformation is {transformation:'size':{size} and 'rotation':{rotation}}"))
     print("ok")
 
 
@@ -354,13 +356,13 @@ def test_message_client(m):
 
 
 
-test_coordinates()
+#test_coordinates()
 # test_coordinates_list()
 # test_location()
 # test_location_list()
 # test_shape()
 # test_transformation()
-# test_space()
+test_space()
 # test_cell()
 # test_world_configuration()
 # test_world_implementation()

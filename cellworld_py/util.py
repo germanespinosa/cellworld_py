@@ -100,6 +100,26 @@ class Json_object:
         return True
 
     def format(self, format_string):
+        check_type(format_string, str, "wrong type for format_string")
+        v = vars(self)
+        for k in v:
+            if not isinstance(v[k], Json_object):
+                continue
+            pos = format_string.find("{"+k+":")
+            if pos >= 0:
+                sub_format_start = format_string.find(":", pos) + 1
+                sub_format_end = sub_format_start
+                bracket_count = 1
+                while bracket_count and sub_format_end < len(format_string):
+                    c = format_string[sub_format_end]
+                    if c == '{':
+                        bracket_count += 1
+                    if c == '}':
+                        bracket_count -= 1
+                    sub_format_end +=1
+                sub_format = format_string[sub_format_start:sub_format_end-1]
+                sub_str = v[k].format(sub_format)
+                format_string = format_string[:pos] + sub_str + format_string[sub_format_end:]
         return format_string.format(**vars(self))
 
 
