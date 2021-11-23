@@ -33,12 +33,12 @@ class World_implementation(Json_object):
         self.cell_transformation = cell_transformation
 
     @staticmethod
-    def get_from_name(world_name, name):
-        if not type(world_name) is str:
-            raise "incorrect type for world_name"
-        if not type(name) is str:
-            raise "incorrect type for name"
-        return Json_get(get_resource("world_implementation", world_name, name), World_implementation)
+    def get_from_name(world_configuration_name, world_implementation_name):
+        if not type(world_configuration_name) is str:
+            raise "incorrect type for world_configuration_name"
+        if not type(world_implementation_name) is str:
+            raise "incorrect type for world_implementation_name"
+        return Json_get(get_resource("world_implementation", world_configuration_name, world_implementation_name), World_implementation)
 
     @staticmethod
     def create(world_configuration, space, cell_transformation=None, relative_locations=None, relative_locations_transformations=None, center_coordinates=None):
