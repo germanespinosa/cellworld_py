@@ -67,8 +67,6 @@ def angle_difference(a1, a2):
 
 
 class Json_object:
-    def __init__(self):
-        pass
 
     def __str__(self):
         s = ""

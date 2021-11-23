@@ -9,7 +9,7 @@ class Shape(Json_object):
 
 
 class Transformation(Json_object):
-    def __init__(self, size=0, rotation=0):
+    def __init__(self, size=0.0, rotation=0.0):
         self.size = float(size)
         self.rotation = float(rotation)
 
@@ -43,7 +43,6 @@ class Space(Json_object):
         theta = src_space.center.atan(location)
         new_location = Location(dst_space.center.x, dst_space.center.y)
         return new_location.move(theta + rotation, dist * size_ratio)
-
 
 
 class Polygon:
@@ -109,7 +108,6 @@ class Polygon:
                     if diff_theta_center + diff_theta_vertex < math.pi:
                         return True
         return False
-
 
 
 class Polygon_list(Json_list):
