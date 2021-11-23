@@ -160,8 +160,7 @@ class Experiment(Json_object):
         return canonical_experiment
 
     def transform(self, dst_space):
-        check_type(dst_space, Space, "incorrect type for dst_space")
-
+        check_type(dst_space, str, "incorrect type for dst_space")
         if dst_space is None:
             dst_space = World_implementation.get_from_name(self.world_configuration_name, dst_space).space
         self.world_implementation_name = dst_space
