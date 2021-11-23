@@ -1,7 +1,8 @@
 from .util import *
 from .coordinates import *
 from .location import *
-
+from .shape import Space
+from .world import World_implementation
 # https://doc-0g-c0-docs.googleusercontent.com/docs/securesc/p1k2kcnbi5084m8mcvkl0g9hv0spbipl/qm0siiabkdslf53ec2jokfp3kr8ak43p/1635330750000/09425701396282971692/17330557302626681944Z/1e8IRExVcKgw2trIn6Lj_Dm080Ky21T7s?e=download
 
 
@@ -146,4 +147,25 @@ class Experiment(Json_object):
         check_type(e, Experiment, "")
         return e
 
+    def get_canonical(self):
+        canonical_experiment = Experiment(name=self.name,
+                                          world_configuration_name=self.world_configuration_name,
+                                          world_implementation_name=self.world_implementation_name,
+                                          occlusions=self.occlusions,
+                                          subject_name=self.subject_name,
+                                          duration=self.duration,
+                                          start_time=self.start_time,
+                                          episodes=self.episodes.copy())
+        canonical_experiment.transform(dst_space="canonical")
+        return canonical_experiment
+
+    def transform(self, dst_space):
+        check_type(dst_space, Space, "incorrect type for dst_space")
+
+        if dst_space is None:
+            dst_space = World_implementation.get_from_name(self.world_configuration_name, dst_space).space
+        src_space = World_implementation.get_from_name(self.world_configuration_name, self.world_implementation_name).space
+        for episode in self.episodes:
+            for step in episode.trajectories:
+                step.location = Space.transform_to(step.location, self.space, dst_space)
 
