@@ -164,6 +164,7 @@ class Experiment(Json_object):
 
         if dst_space is None:
             dst_space = World_implementation.get_from_name(self.world_configuration_name, dst_space).space
+        self.world_implementation_name = dst_space
         src_space = World_implementation.get_from_name(self.world_configuration_name, self.world_implementation_name).space
         for episode in self.episodes:
             for step in episode.trajectories:
