@@ -362,7 +362,7 @@ def test_message_client(m):
 # test_location_list()
 # test_shape()
 # test_transformation()
-test_space()
+#test_space()
 # test_cell()
 # test_world_configuration()
 # test_world_implementation()
@@ -380,3 +380,15 @@ test_space()
 #     print(1)
 #     time.sleep(1)
 
+
+
+e = Episode()
+
+e.trajectories.append(Step())
+
+print (e)
+e2 = Episode()
+e2.trajectories.append(Step())
+print (e2)
+
+print (e)

@@ -6,10 +6,14 @@ from .location import *
 
 
 class Step(Json_object):
-    def __init__(self, time_stamp=0.0, agent_name="", frame=0, coordinates=Coordinates(0,0), location=Location(0,0), rotation=0.0, data=""):
+    def __init__(self, time_stamp=0.0, agent_name="", frame=0, coordinates=None, location=None, rotation=0.0, data=""):
         self.time_stamp = time_stamp
         self.agent_name = agent_name
         self.frame = frame
+        if coordinates is None:
+            coordinates = Coordinates(0, 0)
+        if location is None:
+            location = Location(0,0)
         self.coordinates = coordinates
         self.location = location
         self.rotation = rotation
@@ -103,10 +107,12 @@ class Trajectories(Json_list):
 
 
 class Episode(Json_object):
-    def __init__(self, start_time="", time_stamp=0.0, end_time="", trajectories=Trajectories()):
+    def __init__(self, start_time="", time_stamp=0.0, end_time="", trajectories=None):
         self.start_time = start_time
         self.time_stamp = time_stamp
         self.end_time = end_time
+        if trajectories is None:
+            trajectories = Trajectories()
         self.trajectories = trajectories
 
 
@@ -116,7 +122,7 @@ class Episode_list(Json_list):
 
 
 class Experiment(Json_object):
-    def __init__(self, name="", world_configuration_name="", world_implementation_name="", occlusions="", subject_name="", duration=0, start_time="", episodes=Episode_list()):
+    def __init__(self, name="", world_configuration_name="", world_implementation_name="", occlusions="", subject_name="", duration=0, start_time="", episodes=None):
         self.name = name
         self.world_configuration_name = world_configuration_name
         self.world_implementation_name = world_implementation_name
@@ -124,6 +130,8 @@ class Experiment(Json_object):
         self.subject_name = subject_name
         self.duration = duration
         self.start_time = start_time
+        if episodes is None:
+            episodes = Episode_list()
         self.episodes = episodes
 
     @staticmethod

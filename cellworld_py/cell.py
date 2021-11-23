@@ -4,7 +4,11 @@ from .coordinates import Coordinates, Coordinates_list
 
 
 class Cell(Json_object):
-    def __init__(self, cell_id=0, coordinates=Coordinates(), location=Location(), occluded=False):
+    def __init__(self, cell_id=0, coordinates=None, location=None, occluded=False):
+        if coordinates is None:
+            coordinates = Coordinates()
+        if location is None:
+            location = Location()
         check_type(coordinates, Coordinates, "wrong type for coordinates")
         check_type(location, Location, "wrong type for location")
         check_type(cell_id, int, "wrong type for cell_id")
@@ -30,7 +34,9 @@ class Cell_group_builder(Json_list):
 
 
 class Cell_group(Json_list):
-    def __init__(self, iterable=None, world=None, cell_group_builder=[]):
+    def __init__(self, iterable=None, world=None, cell_group_builder=None):
+        if cell_group_builder is None:
+            cell_group_builder = []
         Json_list.__init__(self, iterable, allowedType=Cell)
         if world:
             for cell_id in cell_group_builder:

@@ -48,7 +48,9 @@ class Space(Json_object):
 
 class Polygon:
 
-    def __init__(self, center, sides=0, radius=1.0, rotation=0, vertices=Location_list()):
+    def __init__(self, center, sides=0, radius=1.0, rotation=0, vertices=None):
+        if vertices is None:
+            vertices = Location_list()
         check_type(center, Location, "incorrect type for center")
         check_type(sides, int, "incorrect type for sides")
         check_type(vertices, Location_list, "incorrect type for sides")

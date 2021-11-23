@@ -21,7 +21,13 @@ class World_configuration(Json_object):
 
 class World_implementation(Json_object):
 
-    def __init__(self, cell_locations=Location_list(), space=Space(), cell_transformation=Transformation()):
+    def __init__(self, cell_locations=None, space=None, cell_transformation=None):
+        if cell_locations is None:
+            cell_locations = Location_list()
+        if space is None:
+            space = Space()
+        if cell_transformation is None:
+            cell_transformation = Transformation()
         self.cell_locations = cell_locations
         self.space = space
         self.cell_transformation = cell_transformation
@@ -35,7 +41,9 @@ class World_implementation(Json_object):
         return Json_get(get_resource("world_implementation", world_name, name), World_implementation)
 
     @staticmethod
-    def create(world_configuration, space, cell_transformation=None, relative_locations=None, relative_locations_transformations=None, center_coordinates=Coordinates(0, 0)):
+    def create(world_configuration, space, cell_transformation=None, relative_locations=None, relative_locations_transformations=None, center_coordinates=None):
+        if center_coordinates is None:
+            center_coordinates = Coordinates(0, 0)
         if relative_locations is None:
             if relative_locations_transformations is None:
                 raise "either relative_locations or relative_locations_transformations must be used"
