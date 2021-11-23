@@ -381,14 +381,10 @@ def test_message_client(m):
 #     time.sleep(1)
 
 
+e = Experiment.get_from_file("20211015_1148_FPM1_00_00_R6_co2.json")
+e.transform("canonical")
 
-e = Episode()
+print (e.world_implementation_name)
 
-e.trajectories.append(Step())
-
-print (e)
-e2 = Episode()
-e2.trajectories.append(Step())
-print (e2)
-
-print (e)
+# print (ce.episodes[0])
+# print (ce.episodes[0].trajectories[0])

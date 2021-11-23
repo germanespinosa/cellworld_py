@@ -147,25 +147,14 @@ class Experiment(Json_object):
         check_type(e, Experiment, "")
         return e
 
-    def get_canonical(self):
-        canonical_experiment = Experiment(name=self.name,
-                                          world_configuration_name=self.world_configuration_name,
-                                          world_implementation_name=self.world_implementation_name,
-                                          occlusions=self.occlusions,
-                                          subject_name=self.subject_name,
-                                          duration=self.duration,
-                                          start_time=self.start_time,
-                                          episodes=self.episodes.copy())
-        canonical_experiment.transform(dst_space="canonical")
-        return canonical_experiment
+    def transform(self, dst_space_name):
+        check_type(dst_space_name, str, "incorrect type for dst_space")
 
-    def transform(self, dst_space):
-        check_type(dst_space, str, "incorrect type for dst_space")
-        if dst_space is None:
-            dst_space = World_implementation.get_from_name(self.world_configuration_name, dst_space).space
-        self.world_implementation_name = dst_space
+        dst_space = World_implementation.get_from_name(self.world_configuration_name, dst_space_name).space
+
         src_space = World_implementation.get_from_name(self.world_configuration_name, self.world_implementation_name).space
         for episode in self.episodes:
             for step in episode.trajectories:
-                step.location = Space.transform_to(step.location, self.space, dst_space)
+                step.location = Space.transform_to(step.location, src_space, dst_space)
+        self.world_implementation_name = dst_space_name
 
