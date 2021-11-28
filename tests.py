@@ -2,6 +2,7 @@ from cellworld_py import *
 import matplotlib as mpl
 import numpy as np
 import time
+from random import random
 
 def test_coordinates():
     print("testing coordinates: ", end="")
@@ -391,8 +392,17 @@ def test_message_client(m):
 
 w = World.get_from_parameters_names("hexagonal","mice")
 
-d = Display(w, fig_size=(10,10), padding=0, cell_edge_color="lightgrey", background_color="black", habitat_edge_color="lightgrey")
+d = Display(w, fig_size=(10, 10), padding=0, cell_edge_color="lightgrey", background_color="black", habitat_edge_color="lightgrey")
+point = Location()
+p = Polygon(w.implementation.space.center, w.implementation.space.shape.sides, w.implementation.space.transformation.size /2, w.implementation.space.transformation.rotation)
+for i in range(10000):
+    point.x = w.implementation.space.center.x
+    point.y = w.implementation.space.center.y
+    point.move(random() * 6.28, random()*1.5)
+    if p.contains(point):
+        d.circle(point, .01, "green")
+    else:
+        d.circle(point, .01, "red")
 
-d.circle(Location(0,0),.01,"red")
 
 plt.show()

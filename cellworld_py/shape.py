@@ -57,7 +57,7 @@ class Polygon:
         self.vertices = vertices
         self.radius = float(radius)
         if sides > 0:
-            if len(self.vertices.locations) != 0:
+            if len(self.vertices) != 0:
                 raise "cannot use sides and vertices together"
             rotation = float(rotation)
             if sides == 0:
@@ -84,6 +84,11 @@ class Polygon:
         self.center = location
         for v in self.vertices:
             v = v + dif
+
+    def contains(self, location):
+        if self.center.dist(location) > self.radius:
+            return False
+        return True
 
     def is_between(self, src=None, dst=None, theta=None, dist=None):
         check_type(src, Location, "incorrect type for src")
