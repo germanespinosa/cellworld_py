@@ -66,6 +66,15 @@ def angle_difference(a1, a2):
             return a1 + math.pi * 2.0 - a2, 1
 
 
+def angle_between(value, lim1, lim2, inclusive=False):
+    diff1, dir1 = angle_difference(value, lim1)
+    diff2, dir2 = angle_difference(value, lim2)
+    if inclusive:
+        if diff1 == 0 or diff2 == 0:
+            return True
+    return (dir1 + dir2) == 0
+
+
 class Json_object:
 
     def __str__(self):
@@ -96,6 +105,16 @@ class Json_object:
             if v[k] != vo[k]:
                 return False
         return True
+
+    def copy(self):
+        new_object = type(self)()
+        v = vars(self)
+        nv = vars(new_object)
+        for k in v:
+            if k[0] == "_":
+                continue
+            nv[k] = v[k]
+        return new_object
 
     def format(self, format_string):
         check_type(format_string, str, "wrong type for format_string")

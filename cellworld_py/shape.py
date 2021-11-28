@@ -1,4 +1,4 @@
-from .location import Location, Location_list
+from .location import Location, Location_list, segments_intersect
 from .util import *
 import math
 
@@ -65,7 +65,7 @@ class Polygon:
             theta = math.radians(rotation)
             inc = 2.0 * math.pi / sides
             for s in range(sides):
-                c = center
+                c = center.copy()
                 self.vertices.append(c.move(theta, radius))
                 theta += inc
         else:
@@ -86,8 +86,16 @@ class Polygon:
             v = v + dif
 
     def contains(self, location):
-        if self.center.dist(location) > self.radius:
+        check_type(location, Location, "incorrect type for location")
+        dist = self.center.dist(location)
+        if dist > self.radius:
             return False
+        inner_radius = self.center.dist(segment=(self.vertices[0], self.vertices[1]))
+        if dist < inner_radius:
+            return True
+        for i in range(1, len(self.vertices)):
+            if segments_intersect((self.center, location), (self.vertices[i], self.vertices[i-1])):
+                return False
         return True
 
     def is_between(self, src=None, dst=None, theta=None, dist=None):

@@ -395,7 +395,7 @@ w = World.get_from_parameters_names("hexagonal","mice")
 d = Display(w, fig_size=(10, 10), padding=0, cell_edge_color="lightgrey", background_color="black", habitat_edge_color="lightgrey")
 point = Location()
 p = Polygon(w.implementation.space.center, w.implementation.space.shape.sides, w.implementation.space.transformation.size /2, w.implementation.space.transformation.rotation)
-for i in range(10000):
+for i in range(1000):
     point.x = w.implementation.space.center.x
     point.y = w.implementation.space.center.y
     point.move(random() * 6.28, random()*1.5)
@@ -403,6 +403,7 @@ for i in range(10000):
         d.circle(point, .01, "green")
     else:
         d.circle(point, .01, "red")
-
-
 plt.show()
+
+
+print( segments_intersect((Location(10,10),Location(20,20)), (Location(20,10),Location(10,20))))
