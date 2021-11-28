@@ -381,10 +381,18 @@ def test_message_client(m):
 #     time.sleep(1)
 
 
-e = Experiment.get_from_file("20211015_1148_FPM1_00_00_R6_co2.json")
-e.transform("canonical")
-
-print (e.world_implementation_name)
+# e = Experiment.get_from_file("20211015_1148_FPM1_00_00_R6_co2.json")
+# e.transform("canonical")
+#
+# print (e.world_implementation_name)
 
 # print (ce.episodes[0])
 # print (ce.episodes[0].trajectories[0])
+
+w = World.get_from_parameters_names("hexagonal","mice")
+
+d = Display(w, fig_size=(10,10), padding=0, cell_edge_color="lightgrey", background_color="black", habitat_edge_color="lightgrey")
+
+d.circle(Location(0,0),.01,"red")
+
+plt.show()

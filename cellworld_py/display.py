@@ -62,4 +62,8 @@ class Display:
                     lcolor = color[i]
                 else:
                     lcolor = color
-                self.ax.plot([x[i], x[i+1]], [y[i],y[i+1]], color=lcolor, alpha=.5, linewidth=3)
+                self.ax.plot([x[i], x[i+1]], [y[i], y[i+1]], color=lcolor, alpha=.5, linewidth=3)
+
+    def circle(self, location, radius, color):
+        circle_patch = plt.Circle((location.x, location.y), radius, color=color)
+        self.ax.add_patch(circle_patch)
