@@ -26,6 +26,22 @@ class Time_out:
     def __bool__(self):
         return self.end_time > datetime.now()
 
+class Timer:
+    def __init__(self, seconds=0):
+        self.time = seconds
+        self.check_point = datetime.now()
+
+    def to_seconds(self):
+        delta=datetime.now() - self.check_point
+        return delta.seconds
+
+    def __bool__(self):
+        return self.to_seconds() < self.time
+
+    def time_out(self):
+        return self.to_seconds() > self.time
+
+
 def check_type(v, t, m):
     if not isinstance(v, t):
         raise TypeError(m)
