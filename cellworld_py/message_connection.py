@@ -40,7 +40,6 @@ class Message_connection:
         self.state = Message_connection.State.Open
         return True
 
-
     def receive(self):
         if not self.state == Message_connection.State.Open: #if the connection is not open
             return

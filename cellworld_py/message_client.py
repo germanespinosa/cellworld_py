@@ -57,30 +57,3 @@ class Message_client:
                         else:
                             response_message = Message(message.header + "_result", str(response))
                             self.connection.send(response_message)
-
-    def contains(self, header):
-        check_type(header, str, "incorrect type for header")
-        for message in self.messages:
-            if message.header == header:
-                return True
-        return False
-
-    def get_message(self, header):
-        i = 0
-        for i in range(len(self.messages)):
-            if self.messages[i].header == header:
-                break
-        else:
-            raise RuntimeError("message not found: " + header)
-        message = self.messages[i].copy()
-        del self.messages[i]
-        return message
-
-    def get_last_message(self, header):
-        if not self.contains(header):
-            raise RuntimeError("message not found: " + header)
-        message = Message()
-        while self.contains(header):
-            message = self.get_message(header).copy()
-        return message
-
