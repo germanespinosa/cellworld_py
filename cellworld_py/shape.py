@@ -96,6 +96,8 @@ class Polygon:
         for i in range(1, len(self.vertices)):
             if segments_intersect((self.center, location), (self.vertices[i], self.vertices[i-1])):
                 return False
+        if segments_intersect((self.center, location), (self.vertices[-1], self.vertices[0])):
+            return False
         return True
 
     def is_between(self, src=None, dst=None, theta=None, dist=None):

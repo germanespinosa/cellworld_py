@@ -6,31 +6,38 @@ from .message_router import Message_router
 
 
 class Message_client:
-    def __init__(self, ip, port):
+    def __init__(self):
         self.unrouted_messages = None
         self.failed_messages = None
         self.running = False
         self.registered = False
         self.router = Message_router()
-        self.parameters = (ip, port)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(self.parameters)
-        self.connection = Message_connection(s, self.failed_messages)
-        self.thread = None
-        self.pending_messages = Message_list()
+        self.router.unrouted_message = self.__unrouted__
+        self.ip = ""
+        self.port = 0
+        self.client_thread = None
+        self.messages = Message_list()
+        self.connection = None
 
-    def start(self):
-        self.thread = Thread(target=self.__proc__)
-        self.thread.start()
+    def __unrouted__(self, message):
+        self.messages.append(message)
+
+    def connect(self, ip, port):
+        check_type(ip, str, "incorrect type for string")
+        check_type(port, int, "incorrect type for port")
+        self.ip = ip
+        self.port = port
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((self.ip, self.port))
+        self.connection = Message_connection(s, self.failed_messages)
+        self.client_thread = Thread(target=self.__proc__)
+        self.client_thread.start()
         while not self.running:
             pass
 
-    def stop(self):
-        self.running = False
-        self.thread.join(4)
-
     def disconnect(self):
-        pass
+        self.running = False
+        self.client_thread.join(4)
 
     def __proc__(self):
         self.running = True
@@ -40,12 +47,40 @@ class Message_client:
                 responses = self.router.route(message)
                 if responses:
                     for response in responses:
+                        if not response:
+                            continue
                         if isinstance(response, Message):
                             self.connection.send(response)
                         elif isinstance(response, bool):
                             response_message = Message(message.header + "_result", "ok" if response else "fail")
                             self.connection.send(response_message)
                         else:
-                            if response:
-                                response_message = Message(message.header+"_result", str(response))
-                                self.connection.send(response_message)
+                            response_message = Message(message.header + "_result", str(response))
+                            self.connection.send(response_message)
+
+    def contains(self, header):
+        check_type(header, str, "incorrect type for header")
+        for message in self.messages:
+            if message.header == header:
+                return True
+        return False
+
+    def get_message(self, header):
+        i = 0
+        for i in range(len(self.messages)):
+            if self.messages[i].header == header:
+                break
+        else:
+            raise RuntimeError("message not found: " + header)
+        message = self.messages[i].copy()
+        del self.messages[i]
+        return message
+
+    def get_last_message(self, header):
+        if not self.contains(header):
+            raise RuntimeError("message not found: " + header)
+        message = Message()
+        while self.contains(header):
+            message = self.get_message(header).copy()
+        return message
+

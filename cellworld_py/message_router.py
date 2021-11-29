@@ -7,8 +7,8 @@ class Message_router:
     def __init__(self):
         self.routes = {}
         self.failed_message = None
+        self.failed_route = None
         self.unrouted_message = None
-        self.processing = False
 
     def add_route(self, pattern, handler, body_type=None):
         check_type(pattern, str, "incorrect type for pattern")
@@ -21,11 +21,16 @@ class Message_router:
         for pattern in self.routes.keys():
             if re.search(pattern, message.header):
                 (handler, body_type) = self.routes[pattern]
-                if body_type:
-                    responses.append(handler(message.get_body(body_type)))
-                else:
-                    responses.append(handler(message))
+                try:
+                    if body_type:
+                        responses.append(handler(message.get_body(body_type)))
+                    else:
+                        responses.append(handler(message))
+                except:
+                    if self.failed_route:
+                        self.failed_route(message)
         if not responses:
             if self.unrouted_message:
                 self.unrouted_message(message)
         return responses
+
