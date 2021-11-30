@@ -40,7 +40,7 @@ def install(version="", force=False):
     try:
         download(url, "cellworld_py.zip")
     except:
-        raise ValueError('cellworld_py version ' + version + 'installation from "' + url + '" failed')
+        raise ValueError('cellworld_py version ' + version + ' installation from "' + url + '" failed')
 
     extract("cellworld_py.zip")
     os.remove("cellworld_py.zip")
