@@ -19,6 +19,14 @@ def get_web_json(resource_uri):
     return json.loads(response.text)
 
 
+def to_radians(rotation):
+    return rotation / 180 * math.pi
+
+
+def to_degrees(theta):
+    return theta * 180 / math.pi
+
+
 class Time_out:
     def __init__(self, seconds=1.0):
         self.end_time = datetime.now() + timedelta(seconds=seconds)
