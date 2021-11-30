@@ -37,7 +37,7 @@ def install(version="", force=False):
         version_v = "_" + version
 
     try:
-        download("https://github.com/germanespinosa/cellworld_py/raw/master/build/cellworld_py" + version_v + ".zip", "cellworld_py.zip")
+        download("https://github.com/germanespinosa/cellworld_py/raw/master/build/cellworld_py" + version_v + ".zip?rnd=" + str(random.Random()), "cellworld_py.zip")
     except:
         raise ValueError('cellworld_py version ' + version + 'installation failed')
 
