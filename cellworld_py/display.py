@@ -66,10 +66,10 @@ class Display:
 
     def circle(self, location, radius, color):
         circle_patch = plt.Circle((location.x, location.y), radius, color=color)
-        self.ax.add_patch(circle_patch)
+        return self.ax.add_patch(circle_patch)
 
     def arrow(self, beginning, theta, dist, color, head_width=.02):
         check_type(beginning, Location, "incorrect type for beginning")
         ending = beginning.copy().move(theta=theta, dist=dist)
         length = ending - beginning
-        self.ax.arrow(beginning.x, beginning.y, length.x, length.y, color=color, head_width=head_width, length_includes_head=True)
+        return self.ax.arrow(beginning.x, beginning.y, length.x, length.y, color=color, head_width=head_width, length_includes_head=True)
