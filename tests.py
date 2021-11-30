@@ -409,8 +409,8 @@ def test_message_client(m):
 # print( segments_intersect((Location(10,10),Location(20,20)), (Location(20,10),Location(10,20))))
 
 
-t = Time_out(2)
+c1 = Coordinates(5,4)
+c2 = c1.copy()
 
-while t:
-    pass
-assert (not t)
+c1.x = 6
+print (c2)

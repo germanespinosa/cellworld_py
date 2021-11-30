@@ -123,14 +123,7 @@ class Json_object:
         return True
 
     def copy(self):
-        new_object = type(self)()
-        v = vars(self)
-        nv = vars(new_object)
-        for k in v:
-            if k[0] == "_":
-                continue
-            nv[k] = v[k]
-        return new_object
+        return Json_get(str(self),type(self))
 
     def format(self, format_string):
         check_type(format_string, str, "wrong type for format_string")
