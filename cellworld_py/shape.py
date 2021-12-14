@@ -31,7 +31,6 @@ class Space(Json_object):
         self.shape = shape
         self.transformation = transformation
 
-
     @staticmethod
     def transform_to(location, src_space, dst_space):
         check_type(location, Location, "incorrect type for location")

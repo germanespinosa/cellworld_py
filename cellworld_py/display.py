@@ -2,13 +2,22 @@ import numpy
 from matplotlib.patches import RegularPolygon
 import matplotlib.pyplot as plt
 import matplotlib.colors
+from matplotlib.transforms import Affine2D
 from .world import *
 from .experiment import *
+from .agent_markers import *
 
 class Display:
-    def __init__(self, world, fig_size=(12, 10), padding=.1, show_axes=False, cell_color="white", occlusion_color="black", background_color="white", habitat_color="white", cell_edge_color="black", habitat_edge_color="black"):
-        if not isinstance(world, World):
-            raise "incorrect type for world"
+
+    def __init__(self, world, fig_size=(12, 10), padding=.1, show_axes=False, cell_color="white", occlusion_color="black", background_color="white", habitat_color="white", cell_edge_color="black", habitat_edge_color="black", animated=False):
+        check_type(world, World, "incorrect type for world")
+        if animated:
+            plt.ion()
+        self.agents = dict()
+        self.agents_markers = dict()
+        self.agents_markers["predator"] = Agent_markers.robot()
+        self.agents_markers["prey"] = Agent_markers.mouse()
+        self.animated = animated
         self.world = world
         self.fig = plt.figure(figsize=fig_size)
         self.ax = self.fig.add_subplot(111)
@@ -73,3 +82,27 @@ class Display:
         ending = beginning.copy().move(theta=theta, dist=dist)
         length = ending - beginning
         return self.ax.arrow(beginning.x, beginning.y, length.x, length.y, color=color, head_width=head_width, length_includes_head=True)
+
+    def agent(self, step=None, agent_name=None, location=None, rotation=None, color=None, size=40):
+        if step:
+            check_type(step, Step, "incorrect type step")
+            agent_name = step.agent_name
+            location = step.location
+            rotation = step.rotation
+
+        check_type(location, Location, "incorrect type location")
+        check_type(rotation, float, "incorrect type rotation")
+
+        if agent_name not in self.agents:
+            self.agents[agent_name], = self.ax.plot(location.x, location.y, marker=Agent_markers.robot(), c=color, markersize=size)
+
+        t = Affine2D().rotate_deg_around(0, 0, -rotation)
+        self.agents[agent_name].set_marker(Agent_markers.robot().transformed(t))
+        self.agents[agent_name].set_xdata(location.x)
+        self.agents[agent_name].set_ydata(location.y)
+
+    def update(self):
+        if self.animated:
+            self.fig.canvas.draw()
+            self.fig.canvas.flush_events()
+            plt.pause(.001)

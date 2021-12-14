@@ -32,7 +32,6 @@ class Cell_group_builder(Json_list):
         return Json_get(get_resource("cell_group", world_name, name, *argv), Cell_group_builder)
 
 
-
 class Cell_group(Json_list):
     def __init__(self, iterable=None, world=None, cell_group_builder=None):
         if cell_group_builder is None:
@@ -41,6 +40,17 @@ class Cell_group(Json_list):
         if world:
             for cell_id in cell_group_builder:
                 self.append(world.cells[cell_id])
+
+    def find (self, location):
+        check_type(location, Location, "incorrect type for location")
+        closest = -1
+        closest_distance = 0
+        for index in range(len(self)):
+            dist = location.dist(self[index])
+            if dist < closest_distance or closest == -1:
+                closest = index
+                closest_distance = dist
+        return closest
 
     def free_cells(self):
         return self.where("occluded", False)
@@ -53,6 +63,7 @@ class Cell_group(Json_list):
         for cell in self:
             cgb.append(cell.id)
         return cgb
+
 
 class Cell_map:
     def __init__(self, coordinates_list):
