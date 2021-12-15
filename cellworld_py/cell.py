@@ -46,7 +46,7 @@ class Cell_group(Json_list):
         closest = -1
         closest_distance = 0
         for index in range(len(self)):
-            dist = location.dist(self[index])
+            dist = location.dist(self[index].location)
             if dist < closest_distance or closest == -1:
                 closest = index
                 closest_distance = dist
