@@ -56,7 +56,6 @@ class Velocities(Json_list):
         return filtered
 
 
-
 class Trajectories(Json_list):
     def __init__(self, iterable=None):
         Json_list.__init__(self, iterable, allowedType=Step)
