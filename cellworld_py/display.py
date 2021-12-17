@@ -6,6 +6,7 @@ from matplotlib.transforms import Affine2D
 from .world import *
 from .experiment import *
 from .agent_markers import *
+from .util import Timer
 
 class Display:
 
@@ -23,7 +24,7 @@ class Display:
         self.ax = self.fig.add_subplot(111)
         self.ax.axes.xaxis.set_visible(show_axes)
         self.ax.axes.yaxis.set_visible(show_axes)
-
+        self.agents_trajectories = Trajectories
         xcenter = world.implementation.space.center.x
         ycenter = world.implementation.space.center.y
 
@@ -83,12 +84,19 @@ class Display:
         length = ending - beginning
         return self.ax.arrow(beginning.x, beginning.y, length.x, length.y, color=color, head_width=head_width, length_includes_head=True)
 
-    def agent(self, step=None, agent_name=None, location=None, rotation=None, color=None, size=40):
+    def agent(self, step=None, agent_name=None, location=None, rotation=None, color=None, size=40, show_trajectory=True):
         if step:
             check_type(step, Step, "incorrect type step")
             agent_name = step.agent_name
             location = step.location
             rotation = step.rotation
+
+
+        if show_trajectory:
+            self.agents_trajectories.append(step)
+            x = self.agents_trajectories.get_agent_trajectory(step.self, agent_name).get("x")
+            y = self.agents_trajectories.get_agent_trajectory(step.self, agent_name).get("y")
+            self.agents[agent_name], = self.ax.plot(x, y, c=color)
 
         check_type(location, Location, "incorrect type location")
         check_type(rotation, float, "incorrect type rotation")
