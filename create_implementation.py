@@ -1,5 +1,5 @@
 import sys
-from cellworld_py import *
+from src import *
 
 
 implementation_name = sys.argv[1]
